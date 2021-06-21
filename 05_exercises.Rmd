@@ -199,9 +199,11 @@ mallorca_map <- get_stamenmap(
 
 
 ```{r eval = FALSE}
-# 
-# mallorca_bike_day7 %>% 
-#   mutate(image = "bike.png")
+
+
+
+mallorca_bike_day7 <- mallorca_bike_day7  %>%
+  mutate(Image = "bike.png")
 
 ggmap(mallorca_map) + 
   geom_path(data = mallorca_bike_day7,
@@ -209,11 +211,17 @@ ggmap(mallorca_map) +
             y = lat,
             color = ele),
              alpha = .8,
-             size = 5) +
+             size = 2) +
   geom_point(data = mallorca_bike_day7, 
         aes(x = lon,
             y = lat),
-        color = "red")+
+        color = "red",
+        size = 4)+
+  geom_image(data = mallorca_bike_day7,
+        aes(x = lon,
+            y = lat,
+            image = Image),
+            size = 0.1) +
   labs(title = "Mallorca race day 7",
        subtitle = "Date : {frame_along}")+
   theme_map() +
@@ -221,9 +229,9 @@ ggmap(mallorca_map) +
 
 
 
-#I tried to add the photo but it was just like a layer on top of the graph and didn't follow the path. I didn't change the legend title because I seriously don't want to run this again, my lapotp is getting toseted and it takes a full mintute to render the gif
 
-#I think I nearly always prefer this  to the stattci map, for this case, it shows us the start and and end of the race while in the static you only see a loop, but animations are often more intuitive and catchy, so I like them better.
+
+#I prefer to the static map since it shows us the start and and end of the race while in the static you only see a loop, and often animations are often more intuitive and catchy, so I like them better.
 ```
 ```{r}
 anim_save("mallorca_bike.gif")
@@ -315,7 +323,7 @@ covoid_anim <- covid19 %>%
   
 
 animate(covoid_anim, duration = 30, nframes = 200)
-  ```
+```
   
   
   7. In this exercise you will animate a map of the US, showing how cumulative COVID-19 cases per 10,000 residents has changed over time. This is similar to exercises 11 & 12 from the previous exercises, with the added animation! So, in the end, you should have something like the static map you made there, but animated over all the days. The code below gives the population estimates for each state and loads the `states_map` data. Here is a list of details you should include in the plot:
