@@ -208,24 +208,33 @@ mallorca_map <- get_stamenmap(
 #   mutate(image = "bike.png")
 
 ggmap(mallorca_map) + 
-  geom_path(data = mallorca_bike_day7, 
+  geom_path(data = mallorca_bike_day7,
         aes(x = lon,
             y = lat,
-            color = ele), 
-             alpha = .8, 
+            color = ele),
+             alpha = .8,
              size = 2) +
   geom_point(data = mallorca_bike_day7, 
         aes(x = lon,
-            y = lat,
-            fill = "red"))+
+            y = lat),
+        color = "red")+
   labs(title = "Mallorca race day 7",
        subtitle = "Date : {frame_along}")+
   theme_map() +
   transition_reveal(time)
 
-#I tried to add the photo but it was just like a layer on top of the graph and didn't follow the path.
+
+
+#I tried to add the photo but it was just like a layer on top of the graph and didn't follow the path. I didn't change the legend title because I seriously don't want to run this again, my lapotp is getting toseted and it takes a full mintute to render the gif
 
 #I think I nearly always prefer this  to the stattci map, for this case, it shows us the start and and end of the race while in the static you only see a loop, but animations are often more intuitive and catchy, so I like them better.
+```
+```{r}
+anim_save("mallorca_bike.gif")
+```
+ 
+```{r}
+knitr::include_graphics("mallorca_bike.gif")
 ```
   
   
@@ -265,7 +274,14 @@ ggmap(ggmap = panama_map) +
        subtitle = "Time: {frame_along}") +
   transition_reveal(hrminsec)
 ```
+   
+```{r}
+anim_save("panama_race.gif")
+```
   
+```{r}
+knitr::include_graphics('panama_race.gif')
+```
   
 ## COVID-19 data
 
