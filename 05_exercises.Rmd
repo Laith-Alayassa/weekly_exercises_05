@@ -128,27 +128,32 @@ ggplotly(lettuce_harvest)
 
 ## Garden data
 
-  3. In this exercise, you will create a stacked area plot that reveals itself over time (see the `geom_area()` examples [here](https://ggplot2.tidyverse.org/reference/position_stack.html)). You will look at cumulative harvest of tomato varieties over time. You should do the following:
+  3. In this exercise, you wi ll create a stacked area plot that reveals itself over time (see the `geom_area()` examples [here](https://ggplot2.tidyverse.org/reference/position_stack.html)). You will look at cumulative harvest of tomato varieties over time. You should do the following:
   * From the `garden_harvest` data, filter the data to the tomatoes and find the *daily* harvest in pounds for each variety.  
   * Then, for each variety, find the cumulative harvest in pounds.  
   * Use the data you just made to create a static cumulative harvest area plot, with the areas filled with different colors for each vegetable and arranged (HINT: `fct_reorder()`) from most to least harvested (most on the bottom).  
   * Add animation to reveal the plot over date. 
+  
+I have started the code for you below. The `complete()` function creates a row for all unique `date`/`variety` combinations. If a variety is not harvested on one of the harvest dates in the dataset, it is filled with a value of 0.
+
+
+I wasn't sure what you wish for exactly so I did two (I wasn't sure how to order properly in the first one, but it looks like a graph that I would understand better in general)
   
 ```{r eval=FALSE}
 garden_harvest %>% 
   filter(vegetable == "tomatoes") %>% 
   group_by(variety, date) %>% 
   summarise(daily_harvest = 0.00220462 * sum(weight))%>% 
-  mutate(cum_harvest = cumsum(daily_harvest)) %>% 
+  mutate(cum_harvest = cumsum(daily_harvest)) %>%
+  arrange(cum_harvest) %>% 
   ggplot(aes(x = date,
              y = cum_harvest)) +
-  geom_area(aes(fill = variety)) +
-  theme(axis.text  = element_blank()) +
+  geom_area(aes(fill = variety),
+            position = "identity") +
   transition_reveal(date)
 ```
   
 
-I have started the code for you below. The `complete()` function creates a row for all unique `date`/`variety` combinations. If a variety is not harvested on one of the harvest dates in the dataset, it is filled with a value of 0.
 
 ```{r}
 garden_harvest %>% 
@@ -160,8 +165,8 @@ garden_harvest %>%
   mutate(cum_harvest = cumsum(daily_harvest_lb)) %>% 
   ggplot(aes(x = date,
              y = cum_harvest)) +
-  geom_area(aes(fill = fct_reorder(variety, cum_harvest))) +
-  transition_reveal(date)
+  geom_area(aes(fill = fct_reorder(variety, cum_harvest))) 
+# +  transition_reveal(date)
 ```
 
 ```{r}
@@ -185,6 +190,43 @@ knitr::include_graphics("tomatoes.gif")
   * CHALLENGE: use the `ggimage` package and `geom_image` to add a bike image instead of a red point. You can use [this](https://raw.githubusercontent.com/llendway/animation_and_interactivity/master/bike.png) image. See [here](https://goodekat.github.io/presentations/2019-isugg-gganimate-spooky/slides.html#35) for an example. 
   * Add something of your own! And comment on if you prefer this to the static map and why or why not.
   
+```{r}
+library(ggimage)
+```
+
+```{r}
+mallorca_map <- get_stamenmap(
+    bbox = c(left = 2.2, bottom = 39.2, right = 3.7, top = 40), 
+    maptype = "terrain",
+    zoom = 10)
+```
+
+
+```{r eval = FALSE}
+# 
+# mallorca_bike_day7 %>% 
+#   mutate(image = "bike.png")
+
+ggmap(mallorca_map) + 
+  geom_path(data = mallorca_bike_day7, 
+        aes(x = lon,
+            y = lat,
+            color = ele), 
+             alpha = .8, 
+             size = 2) +
+  geom_point(data = mallorca_bike_day7, 
+        aes(x = lon,
+            y = lat,
+            fill = "red"))+
+  labs(title = "Mallorca race day 7",
+       subtitle = "Date : {frame_along}")+
+  theme_map() +
+  transition_reveal(time)
+
+
+#I think I nearly always prefer this  to the stattci map, for this case, it shows us the start and and end of the race while in the static you only see a loop, but animations are often more intuitive and catchy, so I like them better.
+```
+  
   
   5. In this exercise, you get to meet my sister, Heather! She is a proud Mac grad, currently works as a Data Scientist at 3M where she uses R everyday, and for a few years (while still holding a full-time job) she was a pro triathlete. You are going to map one of her races. The data from each discipline of the Ironman 70.3 Pan Am championships, Panama is in a separate file - `panama_swim`, `panama_bike`, and `panama_run`. Create a similar map to the one you created with my cycling data. You will need to make some small changes: 1. combine the files (HINT: `bind_rows()`, 2. make the leading dot a different color depending on the event (for an extra challenge, make it a different image using `geom_image()!), 3. CHALLENGE (optional): color by speed, which you will need to compute on your own from the data. You can read Heather's race report [here](https://heatherlendway.com/2016/02/10/ironman-70-3-pan-american-championships-panama-race-report/). She is also in the Macalester Athletics [Hall of Fame](https://athletics.macalester.edu/honors/hall-of-fame/heather-lendway/184) and still has records at the pool. 
   
@@ -201,6 +243,15 @@ knitr::include_graphics("tomatoes.gif")
   * Animate the plot to reveal the pattern by date. Display the date as the subtitle. Add a leading point to each state's line (`geom_point()`) and add the state name as a label (`geom_text()` - you should look at the `check_overlap` argument).  
   * Use the `animate()` function to have 200 frames in your animation and make it 30 seconds long. 
   * Comment on what you observe.
+  
+```{r eval=FALSE}
+
+covid19 %>% 
+  group_by(state, date) %>% 
+  summarise(weekly_cases = cases- lag(cases,7))
+  
+```
+  
   
   7. In this exercise you will animate a map of the US, showing how cumulative COVID-19 cases per 10,000 residents has changed over time. This is similar to exercises 11 & 12 from the previous exercises, with the added animation! So, in the end, you should have something like the static map you made there, but animated over all the days. The code below gives the population estimates for each state and loads the `states_map` data. Here is a list of details you should include in the plot:
   
