@@ -144,12 +144,16 @@ garden_harvest %>%
   filter(vegetable == "tomatoes") %>% 
   group_by(variety, date) %>% 
   summarise(daily_harvest = 0.00220462 * sum(weight))%>% 
+  ungroup() %>% 
+  complete(variety, date, fill = list(daily_harvest = 0)) %>% 
+  mutate(variety = fct_reorder(variety, daily_harvest)) %>% 
+  group_by(variety) %>% 
   mutate(cum_harvest = cumsum(daily_harvest)) %>%
   arrange(cum_harvest) %>% 
   ggplot(aes(x = date,
              y = cum_harvest)) +
   geom_area(aes(fill = variety),
-            position = "identity") +
+            position = "stack") +
   transition_reveal(date)
 ```
   
@@ -213,7 +217,7 @@ ggmap(mallorca_map) +
             y = lat,
             color = ele),
              alpha = .8,
-             size = 2) +
+             size = 5) +
   geom_point(data = mallorca_bike_day7, 
         aes(x = lon,
             y = lat),
@@ -296,8 +300,9 @@ knitr::include_graphics('panama_race.gif')
 ```{r eval=FALSE}
 
 covid19 %>% 
-  group_by(state, date) %>% 
-  summarise(weekly_cases = cases- lag(cases,7))
+  group_by(state) %>% 
+  summarise(weekly_cases = cases- lag(cases, 7, order_by = date)
+)
   
 ```
   
